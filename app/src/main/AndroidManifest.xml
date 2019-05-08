@@ -22,7 +22,7 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity"
+        <activity android:name="com.google.android.gms.samples.vision.ocrreader.com.oultoncollege.licenseplateocr.OcrCaptureActivity"
             android:label="Read Text">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
