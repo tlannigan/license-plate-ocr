@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.gms.samples.vision.ocrreader"
+    package="com.oultoncollege.licenseplateocr"
     android:installLocation="auto" >
 
     <uses-feature android:name="android.hardware.camera" />
@@ -22,8 +22,8 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name="com.google.android.gms.samples.vision.ocrreader.com.oultoncollege.licenseplateocr.OcrCaptureActivity"
-            android:label="Read Text">
+        <activity android:name="com.oultoncollege.licenseplateocr.OcrCaptureActivity"
+            android:label="LicensePlateReader">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

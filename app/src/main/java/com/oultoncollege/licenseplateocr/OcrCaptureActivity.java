@@ -41,12 +41,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.samples.vision.ocrreader.R;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.oultoncollege.licenseplateocr.camera.CameraSource;
 import com.oultoncollege.licenseplateocr.camera.CameraSourcePreview;
 import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
 import java.util.Locale;
