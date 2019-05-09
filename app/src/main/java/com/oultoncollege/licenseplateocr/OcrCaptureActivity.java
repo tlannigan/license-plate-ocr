@@ -28,10 +28,6 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -39,10 +35,15 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.android.material.snackbar.Snackbar;
 import com.oultoncollege.licenseplateocr.camera.CameraSource;
 import com.oultoncollege.licenseplateocr.camera.CameraSourcePreview;
 import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
@@ -88,8 +89,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         super.onCreate(bundle);
         setContentView(R.layout.ocr_capture);
 
-        preview = (CameraSourcePreview) findViewById(R.id.preview);
-        graphicOverlay = (GraphicOverlay<OcrGraphic>) findViewById(R.id.graphicOverlay);
+        preview = findViewById(R.id.preview);
+        graphicOverlay = findViewById(R.id.graphicOverlay);
 
         // Set good defaults for capturing text.
         boolean autoFocus = true;
@@ -172,7 +173,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * Creates and starts the camera.  Note that this uses a higher resolution in comparison
      * to other detection examples to enable the ocr detector to detect small text samples
      * at long distances.
-     *
+     * <p>
      * Suppressing InlinedApi since there is a check that the minimum version is met before using
      * the constant.
      */
@@ -270,7 +271,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted - initialize the camera source");
             // We have permission, so create the camerasource
-            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus,false);
+            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
             boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
             createCameraSource(autoFocus, useFlash);
             return;
@@ -335,13 +336,11 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 Log.d(TAG, "text data is being spoken! " + text.getValue());
                 // Speak the string.
                 tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-            }
-            else {
+            } else {
                 Log.d(TAG, "text data is null");
             }
-        }
-        else {
-            Log.d(TAG,"no text detected");
+        } else {
+            Log.d(TAG, "no text detected");
         }
         return text != null;
     }
