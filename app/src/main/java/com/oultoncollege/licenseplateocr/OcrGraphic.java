@@ -20,9 +20,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
+import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
 
 import java.util.List;
 

@@ -1,22 +1,26 @@
 package com.oultoncollege.licenseplateocr.data;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+
+import java.util.List;
 
 @Dao
 public interface StudentDao {
 
     @Query("SELECT * FROM student")
-    Student[] getAllStudents();
+    List<Student> getAllStudents();
 
     @Query("SELECT * FROM student WHERE license_plate = :licensePlate")
     Student findStudentByLicensePlate(String licensePlate);
 
     @Insert
-    void fill(Student... students);
+    void add(Student... students);
 
-    @Delete
+    @Insert
+    void fill(List<Student> students);
+
+    @Query("DELETE FROM student")
     void flush();
 }

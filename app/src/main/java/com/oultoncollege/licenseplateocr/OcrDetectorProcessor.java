@@ -18,9 +18,9 @@ package com.oultoncollege.licenseplateocr;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
+import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
 
 /**
  * A very simple Processor which gets detected TextBlocks and adds them to the overlay
