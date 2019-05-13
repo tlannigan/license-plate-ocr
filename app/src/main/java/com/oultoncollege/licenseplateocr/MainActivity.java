@@ -1,9 +1,8 @@
 package com.oultoncollege.licenseplateocr;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.oultoncollege.licenseplateocr.data.AppDatabase;
 import com.oultoncollege.licenseplateocr.data.Student;
@@ -11,10 +10,10 @@ import com.oultoncollege.licenseplateocr.data.Student;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static AppDatabase db;
-    private static TextView textView;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
