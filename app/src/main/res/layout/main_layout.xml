@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageView"
+        android:id="@+id/logo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
@@ -31,7 +31,8 @@
         android:layout_marginBottom="8dp"
         android:background="#4888F3"
         android:text="@string/capture"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +42,7 @@
 
     <Button
         android:id="@+id/refresh_button"
-        android:layout_width="0dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
         android:layout_marginTop="8dp"
@@ -53,7 +54,7 @@
         app:layout_constraintTop_toBottomOf="@+id/capture_button" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/update_status"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"

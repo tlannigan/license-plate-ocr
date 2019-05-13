@@ -13,7 +13,7 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private static AppDatabase db;
-    private TextView textView;
+    private TextView updateStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
             print += student.toString() + "\n";
         }
 
-        textView = findViewById(R.id.textView);
-        textView.setText(print);
+        updateStatus = findViewById(R.id.update_status);
+        updateStatus.setText(print);
     }
 }
