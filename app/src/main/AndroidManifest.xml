@@ -5,7 +5,6 @@
     android:installLocation="auto" >
 
     <uses-feature android:name="android.hardware.camera" />
-
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -15,7 +14,7 @@
         android:icon="@drawable/icon"
         android:label="OcrReaderApp"
         android:supportsRtl = "true"
-        android:theme="@style/Theme.AppCompat"
+        android:theme="@style/MenuTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="com.google.android.gms.version"
@@ -24,12 +23,16 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name="com.oultoncollege.licenseplateocr.MainActivity"
+        <activity android:name=".MainActivity"
             android:label="LicensePlateReader">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".OcrCaptureActivity">
+
         </activity>
     </application>
 

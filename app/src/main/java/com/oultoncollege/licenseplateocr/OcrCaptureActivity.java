@@ -67,7 +67,6 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
     // Constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";
-    public static final String UseFlash = "UseFlash";
     public static final String TextBlockObject = "String";
 
     private CameraSource cameraSource;
@@ -94,13 +93,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         // Set good defaults for capturing text.
         boolean autoFocus = true;
-        boolean useFlash = false;
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            createCameraSource(autoFocus, useFlash);
+            createCameraSource(autoFocus);
         } else {
             requestCameraPermission();
         }
@@ -178,7 +176,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * the constant.
      */
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus, boolean useFlash) {
+    private void createCameraSource(boolean autoFocus) {
         Context context = getApplicationContext();
 
         // TODO: Create the TextRecognizer
@@ -272,8 +270,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.d(TAG, "Camera permission granted - initialize the camera source");
             // We have permission, so create the camerasource
             boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
-            boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
-            createCameraSource(autoFocus, useFlash);
+            createCameraSource(autoFocus);
             return;
         }
 
