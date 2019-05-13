@@ -31,9 +31,9 @@ public class MainActivity extends Activity {
         newStudents.add(student1);
         newStudents.add(student2);
 
-        // db.studentDao().fill(newStudents);
-        // Student student3 = new Student("id3", "Jane", "Smith", "jsmith@mail.com", "JSM987", "Mazda 3", "9867");
-        // db.studentDao().add(student3);
+//         db.studentDao().fill(newStudents);
+//         Student student3 = new Student("id3", "Jane", "Smith", "jsmith@mail.com", "JSM987", "Mazda 3", "9867");
+//         db.studentDao().add(student3);
 
         List<Student> studentList = db.studentDao().getAllStudents();
 
