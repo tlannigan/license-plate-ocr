@@ -22,6 +22,12 @@ public class Student {
 
     public String email;
 
+    @ColumnInfo(name = "program_code")
+    public String programCode;
+
+    @ColumnInfo(name = "program_name")
+    public String programName;
+
     @ColumnInfo(name = "license_plate")
     public String licensePlate;
 
@@ -34,11 +40,13 @@ public class Student {
     public Student() {
     }
 
-    public Student(String id, String firstName, String lastName, String email, String licensePlate, String vehicleMakeModel, String stickerNumber) {
+    public Student(String id, String firstName, String lastName, String email, String programCode, String programName, String licensePlate, String vehicleMakeModel, String stickerNumber) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.programCode = programCode;
+        this.programName = programName;
         this.licensePlate = licensePlate;
         this.vehicleMakeModel = vehicleMakeModel;
         this.stickerNumber = stickerNumber;
@@ -76,6 +84,22 @@ public class Student {
         this.email = email;
     }
 
+    public String getProgramCode() {
+        return programCode;
+    }
+
+    public void setProgramCode(String programCode) {
+        this.programCode = programCode;
+    }
+
+    public String getProgramName() {
+        return programName;
+    }
+
+    public void setProgramName(String programName) {
+        this.programName = programName;
+    }
+
     public String getLicensePlate() {
         return licensePlate;
     }
@@ -101,6 +125,6 @@ public class Student {
     }
 
     public String toString() {
-        return id + " - " + firstName + " " + lastName + " - " + email + " - " + licensePlate + " - " + vehicleMakeModel + " - " + stickerNumber;
+        return "ID: " + id + "\nName: " + firstName + " " + lastName + "\nEmail: " + email + "\nLicense Plate: " + licensePlate + "\nMake & Model: " + vehicleMakeModel + "\nSticker#: " + stickerNumber;
     }
 }
