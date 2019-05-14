@@ -5,31 +5,35 @@ import android.util.Log;
 
 import com.oultoncollege.licenseplateocr.R;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class DataSource {
 
     private static final String DATA_SOURCE = "";
     private static final String TAG = "Data Source Update";
     private Context context;
+    private AppDatabase db;
 
-    public DataSource() {}
-
-    public DataSource(Context context) {
-        this.context = context;
+    public DataSource() {
     }
 
-    public boolean update(AppDatabase db) {
+    public DataSource(Context context, AppDatabase db) {
+        this.context = context;
+        this.db = db;
+    }
+
+    public boolean update() {
         List<Student> newData = fetchNewData();
         if (newData.size() > 0) {
-            removeLocalData(db);
-            addNewData(db, newData);
+            removeLocalData();
+            addNewData(newData);
             return true;
         }
         return false;
@@ -39,26 +43,28 @@ public class DataSource {
         List<Student> students = new ArrayList<>();
 
         try {
-            JSONParser jsonParser = new JSONParser();
-            InputStreamReader json = new InputStreamReader(context.getResources().openRawResource(R.raw.sample));
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
+            InputStream inputStream = context.getResources().openRawResource(R.raw.sample);
 
-            if (jsonObject != null) {
-                JSONArray studentArray = (JSONArray) jsonObject.get("data");
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            String json = scanner.hasNext() ? scanner.next() : "";
 
-                for (Object obj : studentArray) {
-                    JSONObject studentData = (JSONObject) obj;
-                    String id = (String) studentData.get("studentAssignedID");
-                    String firstName = (String) studentData.get("firstName");
-                    String lastName = (String) studentData.get("lastName");
-                    String email = (String) studentData.get("email");
-                    String licensePlate = (String) studentData.get("customField14");
-                    String vehicleMakeModel = (String) studentData.get("customField16");
-                    String stickerNumber = (String) studentData.get("customField15");
+            JSONTokener tokener = new JSONTokener(json);
+            JSONObject jsonObject = new JSONObject(tokener);
 
-                    students.add(new Student(id, firstName, lastName, email, licensePlate, vehicleMakeModel, stickerNumber));
-                }
+            JSONArray studentArray = jsonObject.getJSONArray("data");
+
+            for (int i = 0; i < studentArray.length(); i++) {
+                String id = studentArray.getJSONObject(i).getString("studentAssignedID");
+                String firstName = studentArray.getJSONObject(i).getString("firstName");
+                String lastName = studentArray.getJSONObject(i).getString("lastName");
+                String email = studentArray.getJSONObject(i).getString("email");
+                String licensePlate = studentArray.getJSONObject(i).getString("customField14");
+                String vehicleMakeModel = studentArray.getJSONObject(i).getString("customField16");
+                String stickerNumber = studentArray.getJSONObject(i).getString("customField15");
+
+                students.add(new Student(id, firstName, lastName, email, licensePlate, vehicleMakeModel, stickerNumber));
             }
+
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
@@ -66,11 +72,11 @@ public class DataSource {
         return students;
     }
 
-    private void removeLocalData(AppDatabase db) {
+    private void removeLocalData() {
         db.studentDao().flush();
     }
 
-    private void addNewData(AppDatabase db, List<Student> students) {
+    private void addNewData(List<Student> students) {
         db.studentDao().fill(students);
     }
 }
