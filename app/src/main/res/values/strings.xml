@@ -16,6 +16,7 @@
     <string name="image_desc">App logo</string>
     <string name="capture">Scan</string>
     <string name="refresh_data">Refresh Data</string>
-    <string name="update_success">Successfully updated at %1$s</string>
+    <string name="update_success">Last updated: %1$s</string>
     <string name="update_fail">Unable to update, using offline data.</string>
+    <string name="last_updated" />
 </resources>
