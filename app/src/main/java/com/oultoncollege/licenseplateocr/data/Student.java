@@ -31,7 +31,8 @@ public class Student {
     @ColumnInfo(name = "sticker_number")
     public String stickerNumber;
 
-    public Student() {}
+    public Student() {
+    }
 
     public Student(String id, String firstName, String lastName, String email, String licensePlate, String vehicleMakeModel, String stickerNumber) {
         this.id = id;

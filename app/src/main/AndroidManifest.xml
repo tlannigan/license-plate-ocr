@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.oultoncollege.licenseplateocr"
-    android:installLocation="auto" >
+    android:installLocation="auto">
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -13,7 +13,7 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/icon"
         android:label="OcrReaderApp"
-        android:supportsRtl = "true"
+        android:supportsRtl="true"
         android:theme="@style/MenuTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
@@ -23,7 +23,8 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:label="LicensePlateReader">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,9 +32,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".OcrCaptureActivity">
-
-        </activity>
+        <activity
+            android:name=".OcrCaptureActivity"
+            android:theme="@style/Theme.AppCompat"></activity>
     </application>
 
 </manifest>

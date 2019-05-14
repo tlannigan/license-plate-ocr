@@ -47,6 +47,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.oultoncollege.licenseplateocr.camera.CameraSource;
 import com.oultoncollege.licenseplateocr.camera.CameraSourcePreview;
 import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
+import com.oultoncollege.licenseplateocr.data.AppDatabase;
+import com.oultoncollege.licenseplateocr.data.Student;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -59,58 +61,37 @@ import java.util.Locale;
 public final class OcrCaptureActivity extends AppCompatActivity {
     private static final String TAG = "OcrCaptureActivity";
 
-    // Intent request code to handle updating play services if needed.
-    private static final int RC_HANDLE_GMS = 9001;
+    private static AppDatabase db;
 
-    // Permission request codes need to be < 256
-    private static final int RC_HANDLE_CAMERA_PERM = 2;
-
-    // Constants used to pass extra data in the intent
-    public static final String AutoFocus = "AutoFocus";
-    public static final String TextBlockObject = "String";
+    private static final int RC_HANDLE_GMS = 9001; // updating gms request code
+    private static final int RC_HANDLE_CAMERA_PERM = 2; // must be < 256
 
     private CameraSource cameraSource;
     private CameraSourcePreview preview;
     private GraphicOverlay<OcrGraphic> graphicOverlay;
 
-    // Helper objects for detecting taps and pinches.
-    private ScaleGestureDetector scaleGestureDetector;
-    private GestureDetector gestureDetector;
-
-    // A TextToSpeech engine for speaking a String value.
+    private GestureDetector gestureDetector; // tap
+    private ScaleGestureDetector scaleGestureDetector; // pinch zooming
     private TextToSpeech tts;
 
-    /**
-     * Initializes the UI and creates the detector pipeline.
-     */
+
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.ocr_capture);
 
+        db = AppDatabase.getInstance(getApplicationContext());
+
         preview = findViewById(R.id.preview);
         graphicOverlay = findViewById(R.id.graphicOverlay);
 
-        // Set good defaults for capturing text.
-        boolean autoFocus = true;
-
-        // Check for the camera permission before accessing the camera.  If the
-        // permission is not granted yet, request permission.
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (rc == PackageManager.PERMISSION_GRANTED) {
-            createCameraSource(autoFocus);
-        } else {
-            requestCameraPermission();
-        }
+        checkCameraPermissions();
 
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
-        Snackbar.make(graphicOverlay, "Tap to Speak. Pinch/Stretch to zoom",
-                Snackbar.LENGTH_LONG)
-                .show();
+        Snackbar.make(graphicOverlay, "Tap on text to verify", Snackbar.LENGTH_LONG).show();
 
-        // TODO: Set up the Text To Speech engine.
         TextToSpeech.OnInitListener listener =
                 new TextToSpeech.OnInitListener() {
                     @Override
@@ -126,11 +107,15 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         tts = new TextToSpeech(this.getApplicationContext(), listener);
     }
 
-    /**
-     * Handles the requesting of the camera permission.  This includes
-     * showing a "Snackbar" message of why the permission is needed then
-     * sending the request.
-     */
+    private void checkCameraPermissions() {
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            createCameraSource();
+        } else {
+            requestCameraPermission();
+        }
+    }
+
     private void requestCameraPermission() {
         Log.w(TAG, "Camera permission is not granted. Requesting permission");
 
@@ -176,16 +161,13 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * the constant.
      */
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus) {
+    private void createCameraSource() {
         Context context = getApplicationContext();
 
-        // TODO: Create the TextRecognizer
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
 
-        // TODO: Set the TextRecognizer's Processor.
         textRecognizer.setProcessor(new OcrDetectorProcessor(graphicOverlay));
 
-        // TODO: Check if the TextRecognizer is operational.
         if (!textRecognizer.isOperational()) {
             Log.w(TAG, "Detector dependencies are not yet available");
 
@@ -199,12 +181,11 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             }
         }
 
-        // TODO: Create the cameraSource using the TextRecognizer.
         cameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280, 1012)
                 .setRequestedFps(15.0f)
-                .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO : null)
+                .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)
                 .build();
     }
 
@@ -269,8 +250,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted - initialize the camera source");
             // We have permission, so create the camerasource
-            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
-            createCameraSource(autoFocus);
+            createCameraSource();
             return;
         }
 
@@ -324,15 +304,20 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * @return true if the tap was on a TextBlock
      */
     private boolean onTap(float rawX, float rawY) {
-        // TODO: Speak the text when the user taps on screen.
         OcrGraphic graphic = graphicOverlay.getGraphicAtLocation(rawX, rawY);
         TextBlock text = null;
         if (graphic != null) {
             text = graphic.getTextBlock();
             if (text != null && text.getValue() != null) {
-                Log.d(TAG, "text data is being spoken! " + text.getValue());
-                // Speak the string.
-                tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+                String formattedText = formatLicense(text.getValue());
+                Student student = db.studentDao().findStudentByLicensePlate(formattedText);
+                if (student != null) {
+                    tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+                    Toast.makeText(this, "Verified", Toast.LENGTH_LONG).show();
+                } else {
+                    tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+                    Toast.makeText(this, "Unverified", Toast.LENGTH_LONG).show();
+                }
             } else {
                 Log.d(TAG, "text data is null");
             }
@@ -340,6 +325,10 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.d(TAG, "no text detected");
         }
         return text != null;
+    }
+
+    public String formatLicense(String license) {
+        return license.replaceAll("[^a-zA-Z0-9]", "");
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {

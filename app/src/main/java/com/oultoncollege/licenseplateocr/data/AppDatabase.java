@@ -11,9 +11,22 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract StudentDao studentDao();
 
-    public static AppDatabase getDatabase(Context context) {
-        return Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "licenseplate.db")
+    private static AppDatabase licenseDB;
+
+    public static AppDatabase getInstance(Context context) {
+        if (licenseDB == null) {
+            licenseDB = buildDatabaseInstance(context);
+        }
+        return licenseDB;
+    }
+
+    public static AppDatabase buildDatabaseInstance(Context context) {
+        return Room.databaseBuilder(context, AppDatabase.class, "licenseplate.db")
                 .allowMainThreadQueries()
                 .build();
+    }
+
+    public void release() {
+        licenseDB = null;
     }
 }
