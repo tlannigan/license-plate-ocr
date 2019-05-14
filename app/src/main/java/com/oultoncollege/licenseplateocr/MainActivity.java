@@ -23,7 +23,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         updateStatus = findViewById(R.id.update_status);
-
         db = AppDatabase.getInstance(getApplicationContext());
     }
 
@@ -36,9 +35,9 @@ public class MainActivity extends Activity {
         DataSource data = new DataSource(this, db);
         if (data.update()) {
             String date = new SimpleDateFormat("hh:mm a MMM dd, yyyy", Locale.CANADA).format(new Date());
-            updateStatus.setText("Last updated: " + date);
+            updateStatus.setText(getString(R.string.update_success, date));
         } else {
-            updateStatus.setText("Unable to update, using offline data.");
+            updateStatus.setText(R.string.update_fail);
         }
     }
 }

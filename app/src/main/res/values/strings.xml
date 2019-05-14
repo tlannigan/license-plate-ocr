@@ -14,7 +14,8 @@
     <string name="ocr_error">"Error reading text: %1$s"</string>
 
     <string name="image_desc">App logo</string>
-    <string name="refresh_data">Refresh Data</string>
-    <string name="update_status">Last updated: a while ago</string>
     <string name="capture">Scan</string>
+    <string name="refresh_data">Refresh Data</string>
+    <string name="update_success">Successfully updated at %1$s</string>
+    <string name="update_fail">Unable to update, using offline data.</string>
 </resources>
