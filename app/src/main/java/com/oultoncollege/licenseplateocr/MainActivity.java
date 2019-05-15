@@ -5,14 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.oultoncollege.licenseplateocr.data.AppDatabase;
 import com.oultoncollege.licenseplateocr.data.DataSource;
+import com.oultoncollege.licenseplateocr.data.Student;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
@@ -35,7 +38,7 @@ public class MainActivity extends Activity {
     }
 
     public void refreshData(View view) {
-        DataSource data = new DataSource(this, db);
+        DataSource data = new DataSource(db);
         if (data.update()) {
             String date = new SimpleDateFormat("hh:mm a MMM dd, yyyy", Locale.CANADA).format(new Date());
             writeLastUpdated(date);
@@ -43,6 +46,13 @@ public class MainActivity extends Activity {
         } else {
             updateStatus.setText(R.string.update_fail);
         }
+
+        // ********** Test to make sure data gets fetched **********
+        List<Student> studentList = db.studentDao().getAllStudents();
+        for (Student student : studentList) {
+            Log.i("TEST", student.toString());
+        }
+        // *********************************************************
     }
 
     public String readLastUpdated() {
