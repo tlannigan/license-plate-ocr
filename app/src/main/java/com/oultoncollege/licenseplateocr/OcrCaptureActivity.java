@@ -309,7 +309,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         if (graphic != null) {
             text = graphic.getTextBlock();
             if (text != null && text.getValue() != null) {
-                String formattedText = formatLicense(text.getValue());
+                String formattedText = text.getValue().replaceAll("[^a-zA-Z0-9]", "");
                 Student student = db.studentDao().findStudentByLicensePlate(formattedText);
                 if (student != null) {
                     tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
@@ -325,10 +325,6 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.d(TAG, "no text detected");
         }
         return text != null;
-    }
-
-    public String formatLicense(String license) {
-        return license.replaceAll("[^a-zA-Z0-9]", "");
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
