@@ -2,6 +2,8 @@ package com.oultoncollege.licenseplateocr.data;
 
 import android.os.AsyncTask;
 
+import com.oultoncollege.licenseplateocr.BuildConfig;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -16,8 +18,8 @@ import java.util.Scanner;
 public class DataSource {
 
     private static final String API_ENDPOINT = "https://oulton.ampeducator.com/api/student/get";
-    private static String apiKey = "";
-    private static String apiQuery = "?apiKey=" + apiKey + "&currentProgramStatus=enrolled&limit=100&offset=";
+    private String apiKey = BuildConfig.apiKey;
+    private String apiQuery = "?apiKey=" + apiKey + "&currentProgramStatus=enrolled&limit=100&offset=";
     private AppDatabase db;
 
     public DataSource(AppDatabase db) {
