@@ -111,7 +111,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         for (Text currentText : textComponents) {
             float left = translateX(currentText.getBoundingBox().left);
             float bottom = translateY(currentText.getBoundingBox().bottom);
-            canvas.drawText(currentText.getValue(), left, bottom, textPaint);
+            canvas.drawText(currentText.getValue().replaceAll("[^a-zA-Z0-9]", ""), left, bottom, textPaint);
         }
     }
 }
