@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,13 +35,50 @@ public class DataSource {
     }
 
     private List<Student> fetchNewData() {
-        List<Student> students;
-        try {
-            students = new FetchJSON().execute().get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            students = new ArrayList<>();
-        }
+        List<Student> students = new ArrayList<>();
+        int offset = 0;
+        boolean hasStudents = true;
+
+        do {
+            try {
+                URL requestURL = new URL(API_ENDPOINT + apiQuery + offset);
+                String json = new FetchJSON().execute(requestURL).get();
+
+                JSONTokener tokener = new JSONTokener(json);
+                JSONObject jsonObject = new JSONObject(tokener);
+
+                JSONArray studentArray = jsonObject.getJSONArray("data");
+
+                if (studentArray.length() > 0) {
+                    for (int i = 0; i < studentArray.length(); i++) {
+                        if (!studentArray.getJSONObject(i).has("customField14"))
+                            continue;
+
+                        String id = studentArray.getJSONObject(i).getString("studentAssignedID");
+                        String firstName = studentArray.getJSONObject(i).getString("firstName");
+                        String lastName = studentArray.getJSONObject(i).getString("lastName");
+                        String email = studentArray.getJSONObject(i).getString("email");
+                        String programCode = studentArray.getJSONObject(i).getString("currentProgramCode");
+                        String programName = studentArray.getJSONObject(i).getString("currentProgramName");
+                        String licensePlate = studentArray.getJSONObject(i).getString("customField14");
+                        String vehicleMakeModel = (studentArray.getJSONObject(i).has("customField16")) ? studentArray.getJSONObject(i).getString("customField16") : "";
+                        String stickerNumber = (studentArray.getJSONObject(i).has("customField15")) ? studentArray.getJSONObject(i).getString("customField15") : "";
+
+                        students.add(new Student(id, firstName, lastName, email, programCode, programName, licensePlate, vehicleMakeModel, stickerNumber));
+                    }
+                    offset += 100;
+
+                } else {
+                    hasStudents = false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                break;
+            }
+
+        } while (hasStudents);
+
         return students;
     }
 
@@ -52,61 +90,24 @@ public class DataSource {
         db.studentDao().fill(students);
     }
 
-    private static class FetchJSON extends AsyncTask<Void, Void, List<Student>> {
+    private static class FetchJSON extends AsyncTask<URL, Void, String> {
 
         @Override
-        protected List<Student> doInBackground(Void... voids) {
-            List<Student> students = new ArrayList<>();
-            int offset = 0;
-            boolean hasStudents = true;
+        protected String doInBackground(URL... urls) {
+            String json = "";
+            try {
+                InputStream inputStream = urls[0].openStream();
+                Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+                json = scanner.hasNext() ? scanner.next() : "";
 
-            do {
-                try {
-                    String requestURL = API_ENDPOINT + apiQuery + offset;
-                    InputStream inputStream = new URL(requestURL).openStream();
+                inputStream.close();
+                scanner.close();
 
-                    Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-                    String json = scanner.hasNext() ? scanner.next() : "";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-                    inputStream.close();
-                    scanner.close();
-
-                    JSONTokener tokener = new JSONTokener(json);
-                    JSONObject jsonObject = new JSONObject(tokener);
-
-                    JSONArray studentArray = jsonObject.getJSONArray("data");
-
-                    if (studentArray.length() > 0) {
-                        for (int i = 0; i < studentArray.length(); i++) {
-                            if (!studentArray.getJSONObject(i).has("customField14"))
-                                continue;
-
-                            String id = studentArray.getJSONObject(i).getString("studentAssignedID");
-                            String firstName = studentArray.getJSONObject(i).getString("firstName");
-                            String lastName = studentArray.getJSONObject(i).getString("lastName");
-                            String email = studentArray.getJSONObject(i).getString("email");
-                            String programCode = studentArray.getJSONObject(i).getString("currentProgramCode");
-                            String programName = studentArray.getJSONObject(i).getString("currentProgramName");
-                            String licensePlate = studentArray.getJSONObject(i).getString("customField14");
-                            String vehicleMakeModel = (studentArray.getJSONObject(i).has("customField16")) ? studentArray.getJSONObject(i).getString("customField16") : "";
-                            String stickerNumber = (studentArray.getJSONObject(i).has("customField15")) ? studentArray.getJSONObject(i).getString("customField15") : "";
-
-                            students.add(new Student(id, firstName, lastName, email, programCode, programName, licensePlate, vehicleMakeModel, stickerNumber));
-                        }
-                        offset += 100;
-
-                    } else {
-                        hasStudents = false;
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    break;
-                }
-
-            } while (hasStudents);
-
-            return students;
+            return json;
         }
     }
 }
