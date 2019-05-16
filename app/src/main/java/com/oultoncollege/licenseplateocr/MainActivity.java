@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,31 +47,13 @@ public class MainActivity extends Activity {
     }
 
     public void refreshData(View view) {
-
-
         try {
-            DataSource data = new DataSource(db);
-            Boolean dataUpdated = new DataUpdater().execute(data).get();
-
-            if (dataUpdated) {
-                String date = new SimpleDateFormat("hh:mm a MMM dd, yyyy", Locale.CANADA).format(new Date());
-                writeLastUpdated(date);
-                updateStatus.setText(getString(R.string.update_success, readLastUpdated()));
-            } else {
-                updateStatus.setText(R.string.update_fail);
-            }
-
+            DataSource data = new DataSource();
+            new DataUpdater().execute(data);
         } catch (Exception e) {
             e.printStackTrace();
             updateStatus.setText(R.string.update_fail);
         }
-
-        // ********** Test to make sure data gets fetched **********
-//        List<Student> studentList = db.studentDao().getAllStudents();
-//        for (Student student : studentList) {
-//            Log.i("TEST", student.toString());
-//        }
-        // *********************************************************
     }
 
     public String readLastUpdated() {
@@ -91,10 +74,30 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onPreExecute() {
-            updateStatus.setVisibility(View.INVISIBLE);
+            updateStatus.setVisibility(View.GONE);
             updateProgress.setVisibility(View.VISIBLE);
-
             super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            updateStatus.setVisibility(View.VISIBLE);
+            updateProgress.setVisibility(View.GONE);
+
+            if (result) {
+                String date = new SimpleDateFormat("hh:mm a MMM dd, yyyy", Locale.CANADA).format(new Date());
+                writeLastUpdated(date);
+                updateStatus.setText(getString(R.string.update_success, readLastUpdated()));
+            } else {
+                updateStatus.setText(R.string.update_fail);
+            }
+
+            // ********** Test to make sure data gets fetched **********
+            for (Student student : db.studentDao().getAllStudents()) {
+                Log.i("TEST", student.toString());
+            }
+            // *********************************************************
         }
 
         @Override
@@ -105,7 +108,7 @@ public class MainActivity extends Activity {
             do {
                 String json = requestResources(dataSources[0], offset);
                 if (!json.isEmpty()) {
-                    List<Student> fetchedStudents = dataSources[0].parseStudentData(json);;
+                    List<Student> fetchedStudents = dataSources[0].parseStudentData(json);
                     if (fetchedStudents.size() > 0) {
                         students.addAll(fetchedStudents);
                         offset += 100;
@@ -122,14 +125,6 @@ public class MainActivity extends Activity {
             }
 
             return false;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-
-            updateStatus.setVisibility(View.VISIBLE);
-            updateProgress.setVisibility(View.INVISIBLE);
         }
 
         private String requestResources(DataSource data, int offset) {

@@ -14,11 +14,6 @@ public class DataSource {
     private static final String API_ENDPOINT = "https://oulton.ampeducator.com/api/student/get";
     private String apiKey = BuildConfig.apiKey;
     private String apiQuery = "?apiKey=" + apiKey + "&currentProgramStatus=enrolled&limit=100&offset=";
-    private AppDatabase db;
-
-    public DataSource(AppDatabase db) {
-        this.db = db;
-    }
 
     public String getUrl() {
         return API_ENDPOINT + apiQuery;
@@ -58,33 +53,4 @@ public class DataSource {
 
         return students;
     }
-
-    private void removeLocalData() {
-        db.studentDao().flush();
-    }
-
-    private void addNewData(List<Student> students) {
-        db.studentDao().fill(students);
-    }
-
-//    private static class FetchJSON extends AsyncTask<URL, Void, String> {
-//
-//        @Override
-//        protected String doInBackground(URL... urls) {
-//            String json = "";
-//            try {
-//                InputStream inputStream = urls[0].openStream();
-//                Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-//                json = scanner.hasNext() ? scanner.next() : "";
-//
-//                inputStream.close();
-//                scanner.close();
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            return json;
-//        }
-//    }
 }
