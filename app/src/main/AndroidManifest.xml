@@ -5,6 +5,7 @@
     android:installLocation="auto">
 
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -27,7 +28,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="License Reader">
+            android:label="License Reader"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -36,8 +38,7 @@
 
         <activity
             android:name=".OcrCaptureActivity"
-            android:theme="@style/Theme.AppCompat">
-        </activity>
+            android:theme="@style/Theme.AppCompat"></activity>
     </application>
 
 </manifest>

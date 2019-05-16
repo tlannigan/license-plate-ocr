@@ -9,7 +9,7 @@ import org.json.JSONTokener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSource {
+public class StudentDataParser {
 
     private static final String API_ENDPOINT = "https://oulton.ampeducator.com/api/student/get";
     private String apiKey = BuildConfig.apiKey;

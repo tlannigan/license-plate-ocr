@@ -12,9 +12,11 @@
     <string name="ocr_success">Text read successfully</string>
     <string name="ocr_failure">No text captured</string>
     <string name="ocr_error">"Error reading text: %1$s"</string>
+    <string name="manual_input">Manual Input</string>
 
     <string name="image_desc">App logo</string>
     <string name="capture">Scan</string>
+
     <string name="refresh_data">Refresh Data</string>
     <string name="update_success">Last updated: %1$s</string>
     <string name="update_fail">Unable to update, using offline data.</string>

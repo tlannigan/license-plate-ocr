@@ -12,8 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.oultoncollege.licenseplateocr.data.AppDatabase;
-import com.oultoncollege.licenseplateocr.data.DataSource;
 import com.oultoncollege.licenseplateocr.data.Student;
+import com.oultoncollege.licenseplateocr.data.StudentDataParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +48,8 @@ public class MainActivity extends Activity {
 
     public void refreshData(View view) {
         try {
-            DataSource data = new DataSource();
-            new DataUpdater().execute(data);
+            StudentDataParser parser = new StudentDataParser();
+            new DataUpdater().execute(parser);
         } catch (Exception e) {
             e.printStackTrace();
             updateStatus.setText(R.string.update_fail);
@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 
     public String readLastUpdated() {
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.last_updated), Context.MODE_PRIVATE);
-        return sharedPref.getString(getString(R.string.last_updated), "a while ago");
+        return sharedPref.getString(getString(R.string.last_updated), "Never");
     }
 
     public void writeLastUpdated(String date) {
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
         editor.apply();
     }
 
-    private class DataUpdater extends AsyncTask<DataSource, Void, Boolean> {
+    private class DataUpdater extends AsyncTask<StudentDataParser, Void, Boolean> {
 
         private List<Student> students = new ArrayList<>();
 
@@ -101,19 +101,19 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        protected Boolean doInBackground(DataSource... dataSources) {
+        protected Boolean doInBackground(StudentDataParser... parsers) {
             int offset = 0;
             boolean hasStudents = true;
+            String json;
 
             do {
-                String json = "";
                 try {
-                    json = requestResources(dataSources[0], offset);
+                    json = requestResources(parsers[0], offset);
                 } catch (IOException e) {
                     break;
                 }
                 if (!json.isEmpty()) {
-                    List<Student> fetchedStudents = dataSources[0].parseStudentData(json);
+                    List<Student> fetchedStudents = parsers[0].parseStudentData(json);
                     if (fetchedStudents.size() > 0) {
                         students.addAll(fetchedStudents);
                         offset += 100;
@@ -132,8 +132,8 @@ public class MainActivity extends Activity {
             return false;
         }
 
-        private String requestResources(DataSource data, int offset) throws IOException {
-            URL requestURL = new URL(data.getUrl() + offset);
+        private String requestResources(StudentDataParser parser, int offset) throws IOException {
+            URL requestURL = new URL(parser.getUrl() + offset);
             InputStream inputStream = requestURL.openStream();
             Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
             String json = scanner.hasNext() ? scanner.next() : "";

@@ -28,11 +28,19 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.text.InputType;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -105,6 +113,45 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                     }
                 };
         tts = new TextToSpeech(this.getApplicationContext(), listener);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.capture, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.manual_input_text || item.getItemId() == R.id.manual_input_icon) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+            alertDialog.setTitle(getString(R.string.manual_input));
+
+            final EditText input = new EditText(this);
+            input.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+            input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        Student student = db.studentDao().findStudentByLicensePlate(v.getText().toString().replaceAll("[^a-zA-Z0-9]", "").toUpperCase());
+                        if (student != null) {
+                            tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+                            Toast.makeText(OcrCaptureActivity.this, "Verified", Toast.LENGTH_LONG).show();
+                        } else {
+                            tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+                            Toast.makeText(OcrCaptureActivity.this, "Unverified", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    return false;
+                }
+            });
+            alertDialog.setView(input);
+            alertDialog.show();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void checkCameraPermissions() {
