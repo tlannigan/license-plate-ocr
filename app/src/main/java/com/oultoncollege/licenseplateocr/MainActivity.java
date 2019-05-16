@@ -106,7 +106,12 @@ public class MainActivity extends Activity {
             boolean hasStudents = true;
 
             do {
-                String json = requestResources(dataSources[0], offset);
+                String json = "";
+                try {
+                    json = requestResources(dataSources[0], offset);
+                } catch (IOException e) {
+                    break;
+                }
                 if (!json.isEmpty()) {
                     List<Student> fetchedStudents = dataSources[0].parseStudentData(json);
                     if (fetchedStudents.size() > 0) {
@@ -127,23 +132,16 @@ public class MainActivity extends Activity {
             return false;
         }
 
-        private String requestResources(DataSource data, int offset) {
-            try {
-                URL requestURL = new URL(data.getUrl() + offset);
-                InputStream inputStream = requestURL.openStream();
-                Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-                String json = scanner.hasNext() ? scanner.next() : "";
+        private String requestResources(DataSource data, int offset) throws IOException {
+            URL requestURL = new URL(data.getUrl() + offset);
+            InputStream inputStream = requestURL.openStream();
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            String json = scanner.hasNext() ? scanner.next() : "";
 
-                inputStream.close();
-                scanner.close();
+            inputStream.close();
+            scanner.close();
 
-                return json;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return "";
+            return json;
         }
     }
 }
