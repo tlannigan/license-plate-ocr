@@ -39,7 +39,7 @@ public class StudentDataParser {
                     String email = studentArray.getJSONObject(i).getString("email");
                     String programCode = studentArray.getJSONObject(i).getString("currentProgramCode");
                     String programName = studentArray.getJSONObject(i).getString("currentProgramName");
-                    String licensePlate = studentArray.getJSONObject(i).getString("customField14").replaceAll("[^a-zA-Z0-9]", "");
+                    String licensePlate = studentArray.getJSONObject(i).getString("customField14").replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
                     String vehicleMakeModel = (studentArray.getJSONObject(i).has("customField16")) ? studentArray.getJSONObject(i).getString("customField16") : "";
                     String stickerNumber = (studentArray.getJSONObject(i).has("customField15")) ? studentArray.getJSONObject(i).getString("customField15") : "";
 

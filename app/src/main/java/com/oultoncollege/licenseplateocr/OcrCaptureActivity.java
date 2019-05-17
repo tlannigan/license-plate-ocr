@@ -134,16 +134,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        Student student = db.studentDao().findStudentByLicensePlate(v.getText().toString().replaceAll("[^a-zA-Z0-9]", "").toUpperCase());
-                        if (student != null) {
-                            tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-                            Toast.makeText(OcrCaptureActivity.this, "Verified", Toast.LENGTH_LONG).show();
-                        } else {
-                            tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-                            Toast.makeText(OcrCaptureActivity.this, "Unverified", Toast.LENGTH_LONG).show();
-                        }
+                        checkLicensePlate(v.getText().toString());
                     }
-
                     return false;
                 }
             });
@@ -151,7 +143,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             alertDialog.show();
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     private void checkCameraPermissions() {
@@ -356,15 +348,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         if (graphic != null) {
             text = graphic.getTextBlock();
             if (text != null && text.getValue() != null) {
-                String formattedText = text.getValue().replaceAll("[^a-zA-Z0-9]", "");
-                Student student = db.studentDao().findStudentByLicensePlate(formattedText);
-                if (student != null) {
-                    tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-                    Toast.makeText(this, "Verified", Toast.LENGTH_LONG).show();
-                } else {
-                    tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-                    Toast.makeText(this, "Unverified", Toast.LENGTH_LONG).show();
-                }
+                checkLicensePlate(text.getValue());
             } else {
                 Log.d(TAG, "text data is null");
             }
@@ -372,6 +356,18 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.d(TAG, "no text detected");
         }
         return text != null;
+    }
+
+    private void checkLicensePlate(String licensePlate) {
+        licensePlate = licensePlate.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+        Student student = db.studentDao().findStudentByLicensePlate(licensePlate);
+        if (student != null) {
+            tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+            Toast.makeText(this, "Verified", Toast.LENGTH_LONG).show();
+        } else {
+            tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
+            Toast.makeText(this, "Unverified", Toast.LENGTH_LONG).show();
+        }
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
