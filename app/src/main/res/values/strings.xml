@@ -13,6 +13,7 @@
     <string name="ocr_failure">No text captured</string>
     <string name="ocr_error">"Error reading text: %1$s"</string>
     <string name="manual_input">Manual Input</string>
+    <string name="manual_input_dialog">Enter license plate number</string>
 
     <string name="image_desc">App logo</string>
     <string name="capture">Scan</string>

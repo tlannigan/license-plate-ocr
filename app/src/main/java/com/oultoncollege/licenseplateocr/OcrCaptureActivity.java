@@ -67,6 +67,7 @@ import java.util.Locale;
  * size, and contents of each TextBlock.
  */
 public final class OcrCaptureActivity extends AppCompatActivity {
+
     private static final String TAG = "OcrCaptureActivity";
 
     private static AppDatabase db;
@@ -81,7 +82,6 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private GestureDetector gestureDetector; // tap
     private ScaleGestureDetector scaleGestureDetector; // pinch zooming
     private TextToSpeech tts;
-
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -100,18 +100,17 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         Snackbar.make(graphicOverlay, "Tap on text to verify", Snackbar.LENGTH_LONG).show();
 
-        TextToSpeech.OnInitListener listener =
-                new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(final int status) {
-                        if (status == TextToSpeech.SUCCESS) {
-                            Log.d("TTS", "Text to speech engine started successfully.");
-                            tts.setLanguage(Locale.US);
-                        } else {
-                            Log.d("TTS", "Error starting the text to speech engine.");
-                        }
-                    }
-                };
+        TextToSpeech.OnInitListener listener = new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(final int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    Log.d("TTS", "Text to speech engine started successfully.");
+                    tts.setLanguage(Locale.US);
+                } else {
+                    Log.d("TTS", "Error starting the text to speech engine.");
+                }
+            }
+        };
         tts = new TextToSpeech(this.getApplicationContext(), listener);
     }
 
@@ -123,9 +122,9 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.manual_input_text || item.getItemId() == R.id.manual_input_icon) {
+        if (item.getItemId() == R.id.manual_input_text || item.getItemId() == R.id.manual_input_icon) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-            alertDialog.setTitle(getString(R.string.manual_input));
+            alertDialog.setTitle(getString(R.string.manual_input_dialog));
 
             final EditText input = new EditText(this);
             input.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -160,8 +159,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
             return;
         }
@@ -171,13 +169,11 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivityCompat.requestPermissions(thisActivity, permissions,
-                        RC_HANDLE_CAMERA_PERM);
+                ActivityCompat.requestPermissions(thisActivity, permissions, RC_HANDLE_CAMERA_PERM);
             }
         };
 
-        Snackbar.make(graphicOverlay, R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
+        Snackbar.make(graphicOverlay, R.string.permission_camera_rationale, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.ok, listener)
                 .show();
     }
@@ -191,26 +187,15 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         return b || c || super.onTouchEvent(e);
     }
 
-    /**
-     * Creates and starts the camera.  Note that this uses a higher resolution in comparison
-     * to other detection examples to enable the ocr detector to detect small text samples
-     * at long distances.
-     * <p>
-     * Suppressing InlinedApi since there is a check that the minimum version is met before using
-     * the constant.
-     */
     @SuppressLint("InlinedApi")
     private void createCameraSource() {
         Context context = getApplicationContext();
-
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-
         textRecognizer.setProcessor(new OcrDetectorProcessor(graphicOverlay));
 
         if (!textRecognizer.isOperational()) {
             Log.w(TAG, "Detector dependencies are not yet available");
 
-            // Check for low storage. If there is low storage, the native library will not be downloaded, so detection will no become operational.
             IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
             boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
@@ -228,18 +213,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 .build();
     }
 
-    /**
-     * Restarts the camera.
-     */
     @Override
     protected void onResume() {
         super.onResume();
         startCameraSource();
     }
 
-    /**
-     * Stops the camera.
-     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -248,10 +227,6 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Releases the resources associated with the camera source, the associated detectors, and the
-     * rest of the processing pipeline.
-     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -277,9 +252,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * @see #requestPermissions(String[], int)
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
             Log.d(TAG, "Got unexpected permission result: " + requestCode);
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -288,7 +261,6 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted - initialize the camera source");
-            // We have permission, so create the camerasource
             createCameraSource();
             return;
         }
@@ -316,12 +288,10 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      */
     private void startCameraSource() throws SecurityException {
         // check that the device has play services available.
-        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
-                getApplicationContext());
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getApplicationContext());
         if (code != ConnectionResult.SUCCESS) {
-            Dialog dlg =
-                    GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
-            dlg.show();
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
+            dialog.show();
         }
 
         if (cameraSource != null) {
@@ -345,6 +315,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private boolean onTap(float rawX, float rawY) {
         OcrGraphic graphic = graphicOverlay.getGraphicAtLocation(rawX, rawY);
         TextBlock text = null;
+
         if (graphic != null) {
             text = graphic.getTextBlock();
             if (text != null && text.getValue() != null) {
@@ -355,6 +326,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "no text detected");
         }
+
         return text != null;
     }
 
