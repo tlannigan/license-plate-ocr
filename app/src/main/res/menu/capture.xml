@@ -7,7 +7,7 @@
         app:showAsAction="always|withText" />
     <item
         android:id="@+id/manual_input_icon"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/keyboard"
         android:title="@string/manual_input"
         app:showAsAction="always" />
 </menu>
