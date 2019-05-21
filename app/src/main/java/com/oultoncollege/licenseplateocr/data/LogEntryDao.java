@@ -16,11 +16,17 @@ public interface LogEntryDao {
     @Query("SELECT * FROM log WHERE license_plate = :licensePlate")
     LogEntry findLogByLicensePlate(String licensePlate);
 
-    @Query("SELECT * FROM log WHERE time_stamp <= :timeStamp")
-    List<LogEntry> getLogsBeforeDate(long timeStamp);
+    @Query("SELECT * FROM log WHERE date <= :date")
+    List<LogEntry> getLogsBeforeDate(long date);
+
+    @Query("SELECT * FROM log WHERE date = :date")
+    List<LogEntry> getLogsByDate(long date);
 
     @Insert
     void add(LogEntry... logEntries);
+
+    @Query("DELETE FROM log WHERE id = :id")
+    void deleteById(int id);
 
     @Delete
     void remove(LogEntry... logEntries);

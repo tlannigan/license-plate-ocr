@@ -41,7 +41,7 @@
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".LogActivity"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/Theme.AppCompat.Light" />
     </application>
 
 </manifest>

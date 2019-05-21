@@ -8,32 +8,33 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "log")
 public class LogEntry {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
-    @ColumnInfo(name = "time_stamp")
-    public long timeStamp;
+    private int id;
 
     @ColumnInfo(name = "license_plate")
-    public String licensePlate;
+    private String licensePlate;
 
-    public String description;
+    private String description;
+
+    private long date;
 
     public LogEntry() {
 
     }
 
-    public LogEntry(long timeStamp, String licensePlate, String description) {
-        this.timeStamp = timeStamp;
+    public LogEntry(String licensePlate, String description, long date) {
         this.licensePlate = licensePlate;
         this.description = description;
+        this.date = date;
     }
 
-    public long getTimeStamp() {
-        return timeStamp;
+    public int getId() {
+        return id;
     }
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getLicensePlate() {
@@ -50,5 +51,17 @@ public class LogEntry {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public String toString() {
+        return licensePlate + "\n" + description;
     }
 }

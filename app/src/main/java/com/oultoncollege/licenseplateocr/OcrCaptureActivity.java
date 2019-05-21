@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -45,6 +46,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -62,7 +64,10 @@ import com.oultoncollege.licenseplateocr.utils.OcrDetectorProcessor;
 import com.oultoncollege.licenseplateocr.utils.OcrGraphic;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the
@@ -126,7 +131,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.manual_input_text || item.getItemId() == R.id.manual_input_icon) {
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.DialogTheme));
+            final AlertDialog alertDialog = alertBuilder.create();
             alertDialog.setTitle(getString(R.string.manual_input_dialog));
 
             final EditText input = new EditText(this);
@@ -137,11 +143,13 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
                         checkLicensePlate(v.getText().toString());
+                        alertDialog.cancel();
                     }
                     return false;
                 }
             });
             alertDialog.setView(input);
+            Objects.requireNonNull(alertDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             alertDialog.show();
         }
 
@@ -340,23 +348,28 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(OcrCaptureActivity.this);
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(OcrCaptureActivity.this);
+                final AlertDialog alertDialog = alertBuilder.create();
                 alertDialog.setTitle(formattedLicense);
 
                 final EditText input = new EditText(OcrCaptureActivity.this);
                 input.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
                 input.setHint(getString(R.string.log_desc_placeholder));
                 input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            db.logEntryDao().add(new LogEntry(System.currentTimeMillis(), formattedLicense, v.getText().toString()));
+                            long date = Long.parseLong(new SimpleDateFormat("yyyyMMdd", Locale.CANADA).format(new Date()));
+                            db.logEntryDao().add(new LogEntry(formattedLicense, v.getText().toString(), date));
+                            Toast.makeText(OcrCaptureActivity.this, "Entry logged", Toast.LENGTH_SHORT).show();
+                            alertDialog.cancel();
                         }
                         return false;
                     }
                 });
                 alertDialog.setView(input);
+                Objects.requireNonNull(alertDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 alertDialog.show();
             }
         };
