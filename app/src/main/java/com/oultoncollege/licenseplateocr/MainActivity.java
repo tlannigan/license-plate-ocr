@@ -46,6 +46,11 @@ public class MainActivity extends Activity {
         startActivity(scanner);
     }
 
+    public void openLogs(View view) {
+        Intent logs = new Intent(this, LogActivity.class);
+        startActivity(logs);
+    }
+
     public void refreshData(View view) {
         try {
             StudentDataParser parser = new StudentDataParser();

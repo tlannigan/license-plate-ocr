@@ -821,7 +821,7 @@ public class CameraSource {
     }
 
     /**
-     * Gets the id for the camera specified by the direction it is facing.  Returns -1 if no such
+     * Gets the timeStamp for the camera specified by the direction it is facing.  Returns -1 if no such
      * camera was found.
      *
      * @param facing the desired camera (front-facing or rear-facing)
@@ -979,11 +979,11 @@ public class CameraSource {
     }
 
     /**
-     * Calculates the correct rotation for the given camera id and sets the rotation in the
+     * Calculates the correct rotation for the given camera timeStamp and sets the rotation in the
      * parameters.  It also sets the camera's display orientation and rotation.
      *
      * @param parameters the camera parameters for which to set the rotation
-     * @param cameraId   the camera id to set rotation based on
+     * @param cameraId   the camera timeStamp to set rotation based on
      */
     private void setRotation(Camera camera, Camera.Parameters parameters, int cameraId) {
         WindowManager windowManager =

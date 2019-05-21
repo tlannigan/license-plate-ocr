@@ -56,7 +56,10 @@ import com.oultoncollege.licenseplateocr.camera.CameraSource;
 import com.oultoncollege.licenseplateocr.camera.CameraSourcePreview;
 import com.oultoncollege.licenseplateocr.camera.GraphicOverlay;
 import com.oultoncollege.licenseplateocr.data.AppDatabase;
+import com.oultoncollege.licenseplateocr.data.LogEntry;
 import com.oultoncollege.licenseplateocr.data.Student;
+import com.oultoncollege.licenseplateocr.utils.OcrDetectorProcessor;
+import com.oultoncollege.licenseplateocr.utils.OcrGraphic;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -331,14 +334,43 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     }
 
     private void checkLicensePlate(String licensePlate) {
-        licensePlate = licensePlate.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
-        Student student = db.studentDao().findStudentByLicensePlate(licensePlate);
+        final String formattedLicense = licensePlate.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+        Student student = db.studentDao().findStudentByLicensePlate(formattedLicense);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(OcrCaptureActivity.this);
+                alertDialog.setTitle(formattedLicense);
+
+                final EditText input = new EditText(OcrCaptureActivity.this);
+                input.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                input.setHint(getString(R.string.log_desc_placeholder));
+                input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            db.logEntryDao().add(new LogEntry(System.currentTimeMillis(), formattedLicense, v.getText().toString()));
+                        }
+                        return false;
+                    }
+                });
+                alertDialog.setView(input);
+                alertDialog.show();
+            }
+        };
+
         if (student != null) {
             tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-            Toast.makeText(this, "Verified", Toast.LENGTH_LONG).show();
+            Snackbar.make(graphicOverlay, "Verified. Log " + formattedLicense + "?", Snackbar.LENGTH_LONG)
+                    .setAction(R.string.submit_log, listener)
+                    .show();
         } else {
             tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-            Toast.makeText(this, "Unverified", Toast.LENGTH_LONG).show();
+            Snackbar.make(graphicOverlay, "Unverified. Log " + formattedLicense + "?", Snackbar.LENGTH_LONG)
+                    .setAction(R.string.submit_log, listener)
+                    .show();
         }
     }
 

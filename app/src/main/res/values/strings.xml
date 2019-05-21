@@ -17,8 +17,13 @@
 
     <string name="image_desc">App logo</string>
     <string name="capture">Scan</string>
-
+    <string name="logs">Logs</string>
     <string name="refresh_data">Refresh Data</string>
+
+    <string name="submit_log">Log</string>
+    <string name="log_desc_placeholder">Notes…</string>
+    <string name="date_action">Date</string>
+
     <string name="update_success">Last updated: %1$s</string>
     <string name="update_fail">Unable to update, using offline data.</string>
     <string name="last_updated" />
