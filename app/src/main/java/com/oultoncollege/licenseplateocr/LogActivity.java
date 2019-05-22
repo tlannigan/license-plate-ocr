@@ -32,7 +32,6 @@ public class LogActivity extends AppCompatActivity {
     private RecyclerAdapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +49,7 @@ public class LogActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         calendar = findViewById(R.id.calendarView);
+        calendar.setVisibility(View.GONE);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
@@ -96,8 +96,12 @@ public class LogActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.date_picker) {
-            calendar.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT));
-            calendar.setVisibility(View.VISIBLE);
+            if (calendar.getVisibility() == View.GONE) {
+                calendar.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT));
+                calendar.setVisibility(View.VISIBLE);
+            } else {
+                calendar.setVisibility(View.GONE);
+            }
         }
 
         return true;
