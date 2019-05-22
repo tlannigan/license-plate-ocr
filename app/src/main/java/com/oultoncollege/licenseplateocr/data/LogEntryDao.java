@@ -13,6 +13,9 @@ public interface LogEntryDao {
     @Query("SELECT * FROM log")
     List<LogEntry> getAllLogs();
 
+    @Query("SELECT * FROM log WHERE id = :id")
+    LogEntry getLogById(int id);
+
     @Query("SELECT * FROM log WHERE license_plate = :licensePlate")
     LogEntry findLogByLicensePlate(String licensePlate);
 

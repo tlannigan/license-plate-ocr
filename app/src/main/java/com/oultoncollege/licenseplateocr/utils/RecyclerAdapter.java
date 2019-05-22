@@ -61,6 +61,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.LogVie
         notifyItemRemoved(position);
     }
 
+    public void addAt(LogEntry logEntry, int position) {
+        logEntries.add(position, logEntry);
+        notifyItemInserted(position);
+    }
+
+
     @Override
     public int getItemCount() {
         return logEntries.size();

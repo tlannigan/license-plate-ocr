@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -48,6 +49,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -376,14 +378,18 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         if (student != null) {
             tts.speak("Verified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-            Snackbar.make(graphicOverlay, "Verified. Log " + formattedLicense + "?", Snackbar.LENGTH_LONG)
+            Snackbar snackbar = Snackbar.make(graphicOverlay, "Verified. Log " + formattedLicense + "?", Snackbar.LENGTH_LONG)
                     .setAction(R.string.submit_log, listener)
-                    .show();
+                    .setActionTextColor(Color.WHITE);
+            snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.verified));
+            snackbar.show();
         } else {
             tts.speak("Unverified", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
-            Snackbar.make(graphicOverlay, "Unverified. Log " + formattedLicense + "?", Snackbar.LENGTH_LONG)
+            Snackbar snackbar = Snackbar.make(graphicOverlay, "Unverified. Log " + formattedLicense + "?", Snackbar.LENGTH_LONG)
                     .setAction(R.string.submit_log, listener)
-                    .show();
+                    .setActionTextColor(Color.WHITE);
+            snackbar.getView().setBackgroundColor(Color.RED);
+            snackbar.show();
         }
     }
 

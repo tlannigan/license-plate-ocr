@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/date_picker"
+        android:icon="@drawable/calendar"
         android:title="@string/date_action"
         app:showAsAction="always" />
 </menu>

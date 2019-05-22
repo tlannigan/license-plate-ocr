@@ -6,7 +6,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +14,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.oultoncollege.licenseplateocr.data.AppDatabase;
+import com.oultoncollege.licenseplateocr.data.LogEntry;
 import com.oultoncollege.licenseplateocr.utils.RecyclerAdapter;
 
 import java.text.SimpleDateFormat;
@@ -37,11 +38,12 @@ public class LogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_layout);
 
-
         db = AppDatabase.getInstance(getApplicationContext());
 
-        long date = Long.parseLong(new SimpleDateFormat("yyyyMMdd", Locale.CANADA).format(new Date()));
-        recyclerAdapter = new RecyclerAdapter(db.logEntryDao().getLogsByDate(date));
+        Date today = new Date();
+        setTitle("Logs - " + new SimpleDateFormat("MMM dd, yyyy", Locale.CANADA).format(today));
+        long dbDate = Long.parseLong(new SimpleDateFormat("yyyyMMdd", Locale.CANADA).format(today));
+        recyclerAdapter = new RecyclerAdapter(db.logEntryDao().getLogsByDate(dbDate));
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -52,9 +54,11 @@ public class LogActivity extends AppCompatActivity {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 calendar.setVisibility(View.GONE);
-                recyclerAdapter.setLogEntries(db.logEntryDao().getLogsByDate( getFormattedDate(year, month, dayOfMonth) ));
+                String date = new SimpleDateFormat("MMM dd, yyyy", Locale.CANADA).format(new Date((year - 1900), month, dayOfMonth));
+                setTitle("Logs - " + date);
+
+                recyclerAdapter.setLogEntries(db.logEntryDao().getLogsByDate(getFormattedDate(year, month, dayOfMonth)));
                 recyclerAdapter.notifyDataSetChanged();
-                Toast.makeText(LogActivity.this, String.valueOf(getFormattedDate(year, month, dayOfMonth)), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -68,9 +72,15 @@ public class LogActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                recyclerAdapter.removeAt(viewHolder.getAdapterPosition());
-                TextView logID = viewHolder.itemView.findViewById(R.id.log_id);
-                db.logEntryDao().deleteById(Integer.parseInt(logID.getText().toString()));
+                int position = viewHolder.getAdapterPosition();
+                recyclerAdapter.removeAt(position);
+
+                TextView logCard = viewHolder.itemView.findViewById(R.id.log_id);
+                int logID = Integer.parseInt(logCard.getText().toString());
+                LogEntry logToDelete = db.logEntryDao().getLogById(logID);
+                db.logEntryDao().remove(logToDelete);
+
+                makeUndoSnackbar(logToDelete, position);
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
@@ -93,18 +103,35 @@ public class LogActivity extends AppCompatActivity {
         return true;
     }
 
-    public Long getFormattedDate(int year, int month, int dayOfMonth) {
+    public long getFormattedDate(int year, int month, int dayOfMonth) {
         String strMonth, strDayOfMonth;
 
-        if(dayOfMonth < 10)
+        if (dayOfMonth < 10)
             strDayOfMonth = "0" + dayOfMonth;
         else
             strDayOfMonth = String.valueOf(dayOfMonth);
-        if(month < 10)
+        if (month < 10)
             strMonth = "0" + (month + 1);
         else
             strMonth = String.valueOf(month);
 
         return Long.parseLong(year + strMonth + strDayOfMonth);
+    }
+
+    public void makeUndoSnackbar(LogEntry logToDelete, int exitPosition) {
+        final LogEntry logToRestore = logToDelete;
+        final int entryPosition = exitPosition;
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.logEntryDao().add(logToRestore);
+                recyclerAdapter.addAt(logToRestore, entryPosition);
+            }
+        };
+
+        Snackbar.make(recyclerView, getString(R.string.log_delete), Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo_delete, listener)
+                .show();
     }
 }
